@@ -130,7 +130,7 @@ async function init() {
   ]);
   GAMES = gRes.games || [];
   countsData = {};
-  (cRes.counts || []).forEach(c => { countsData[c.game_id] = c.count; });
+  (cRes.counts || []).forEach(c => { if (c.game_id !== 'hub-page') countsData[c.game_id] = c.count; });
   renderGames();
 }
 
@@ -138,7 +138,7 @@ async function loadCounts(period) {
   try {
     const data = await fetch(`${WEB_APP_URL}?action=counts&period=${period}`).then(r=>r.json());
     countsData = {};
-    (data.counts || []).forEach(c => { countsData[c.game_id] = c.count; });
+    (data.counts || []).forEach(c => { if (c.game_id !== 'hub-page') countsData[c.game_id] = c.count; });
   } catch(e) { countsData = {}; }
   renderGames();
 }
