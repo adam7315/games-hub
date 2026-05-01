@@ -45,9 +45,9 @@ header p{font-size:13px;color:rgba(255,255,255,.55)}
 </header>
 
 <div class="filter-bar">
-  <button class="filter-btn active" onclick="setFilter('all')">全部時間</button>
+  <button class="filter-btn" onclick="setFilter('all')">全部時間</button>
   <button class="filter-btn" onclick="setFilter('6months')">近半年</button>
-  <button class="filter-btn" onclick="setFilter('1month')">近一個月</button>
+  <button class="filter-btn active" onclick="setFilter('1month')">近一個月</button>
 </div>
 <div class="total-row">總點閱 <span id="total-count">—</span> 次</div>
 
@@ -84,7 +84,7 @@ const GAMES = [
 ];
 
 let countsData = {};
-let currentFilter = 'all';
+let currentFilter = '1month';
 
 function setFilter(period) {
   currentFilter = period;
@@ -156,7 +156,7 @@ function catColor(cat) {
 }
 
 // 初始載入
-loadCounts('all');
+loadCounts('1month');
 </script>
 </body>
 </html>
