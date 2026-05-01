@@ -87,7 +87,6 @@ footer{text-align:center;padding:32px 16px;color:#484f58;font-size:12px}
   <h1>教學遊戲平台</h1>
   <p>水資源管理與海洋科學互動式課堂遊戲，讓學習更有趣</p>
   <div class="hero-stats">
-    <div class="stat"><div class="stat-num" id="total-visits">—</div><div class="stat-label">頁面開啟次數</div></div>
     <div class="stat"><div class="stat-num" id="total-count">—</div><div class="stat-label">遊戲點擊次數</div></div>
     <div class="stat"><div class="stat-num">3</div><div class="stat-label">款遊戲</div></div>
   </div>
@@ -165,8 +164,6 @@ async function loadCounts(period) {
     const data = await res.json();
     countsData = {};
     (data.counts || []).forEach(c => { countsData[c.game_id] = c.count; });
-    const visits = countsData['hub-page'] || 0;
-    document.getElementById('total-visits').textContent = visits.toLocaleString();
     delete countsData['hub-page'];
   } catch(e) { countsData = {}; }
   renderGames();
@@ -229,9 +226,6 @@ function playGame(id, nameEnc, catEnc, url) {
   fetch(`${WEB_APP_URL}?action=log&game_id=${id}&game_name=${encodeURIComponent(name)}&category=${encodeURIComponent(cat)}`).catch(()=>{});
   window.open(url, '_blank');
 }
-
-// 記錄頁面開啟
-fetch(`${WEB_APP_URL}?action=log&game_id=hub-page&game_name=教學遊戲平台&category=hub`).catch(()=>{});
 
 loadCounts('1month');
 </script>
