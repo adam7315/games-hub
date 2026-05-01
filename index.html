@@ -150,7 +150,7 @@ function renderGames() {
   }
   const categories = [...new Set(GAMES.map(g => g.category))];
   let total = 0;
-  Object.values(countsData).forEach(v => total += v);
+  GAMES.forEach(g => { total += (countsData[g.id] || 0); });
   document.getElementById('total-count').textContent = total.toLocaleString();
 
   const html = categories.map(cat => {
