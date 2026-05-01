@@ -202,7 +202,6 @@ function playGame(id, nameEnc, catEnc, urlEnc) {
   const name = decodeURIComponent(nameEnc);
   const cat  = decodeURIComponent(catEnc);
   const url  = decodeURIComponent(urlEnc);
-  fetch(`${WEB_APP_URL}?action=log&game_id=${id}&game_name=${encodeURIComponent(name)}&category=${encodeURIComponent(cat)}`).catch(()=>{});
   window.open(url, '_blank');
 }
 
