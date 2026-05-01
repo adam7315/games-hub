@@ -104,50 +104,14 @@ footer{text-align:center;padding:32px 16px;color:#484f58;font-size:12px}
 <footer>教學遊戲平台 · 水資源 × 海洋科學</footer>
 
 <script>
-const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx_Xy7gy0lVSpHHwGRoG6pI_pM95PTfQA6zSAfTcerjM3WBbtUHUfw-AH_nKePQ9gstgw/exec';
-
-const GAMES = [
-  {
-    id: 'water-memory-game',
-    name: '水資源記憶配對遊戲',
-    desc: '藍隊 vs 紅隊翻牌對戰，3D 翻牌動畫、配對音效，適合兩人一台電腦的課堂互動',
-    emoji: '💧',
-    category: '水資源遊戲',
-    url: 'https://adam7315.github.io/water-memory-game/'
-  },
-  {
-    id: 'water-quiz-game',
-    name: '水資源管理策略課後大挑戰',
-    desc: '轉盤決定難度，30 秒倒數搶答，適合大螢幕投影、同學輪流上台，課後即時檢驗學習成果',
-    emoji: '🌊',
-    category: '水資源遊戲',
-    url: 'https://adam7315.github.io/water-quiz-game/'
-  },
-  {
-    id: 'food-web-game',
-    name: '海洋食物網遊戲',
-    desc: '探索海洋生態系中的食物鏈與能量流動關係，互動式學習海洋科學核心概念',
-    emoji: '🐠',
-    category: '海洋科學遊戲',
-    url: 'https://adam7315.github.io/food-web-game/'
-  }
-];
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzfT8yepTs4gw8Vjws7gUrUNxtrYsUA4dxCyTuceLrYBVl78LZy02IwLCpNJnqM-eUgyQ/exec';
 
 const CAT_META = {
-  '水資源遊戲': {
-    cls: 'cat-water',
-    icon: '💧',
-    desc: '台南海淡廠水資源教育課程，以遊戲化方式傳遞水資源管理知識',
-    tag: 'Water Resources'
-  },
-  '海洋科學遊戲': {
-    cls: 'cat-ocean',
-    icon: '🌊',
-    desc: 'OSS 海洋科學開箱教學計畫，互動遊戲輔助海洋生態概念學習',
-    tag: 'Ocean Science'
-  }
+  '水資源遊戲':  { cls:'cat-water', icon:'💧', desc:'台南海淡廠水資源教育課程，以遊戲化方式傳遞水資源管理知識', tag:'Water Resources' },
+  '海洋科學遊戲':{ cls:'cat-ocean', icon:'🌊', desc:'OSS 海洋科學開箱教學計畫，互動遊戲輔助海洋生態概念學習', tag:'Ocean Science' }
 };
 
+let GAMES = [];
 let countsData = {};
 let currentFilter = '1month';
 
@@ -158,18 +122,32 @@ function setFilter(period, btn) {
   loadCounts(period);
 }
 
+async function init() {
+  // 同時抓遊戲清單 + 點閱數
+  const [gRes, cRes] = await Promise.all([
+    fetch(`${WEB_APP_URL}?action=games`).then(r=>r.json()).catch(()=>({games:[]})),
+    fetch(`${WEB_APP_URL}?action=counts&period=1month`).then(r=>r.json()).catch(()=>({counts:[]}))
+  ]);
+  GAMES = gRes.games || [];
+  countsData = {};
+  (cRes.counts || []).forEach(c => { countsData[c.game_id] = c.count; });
+  renderGames();
+}
+
 async function loadCounts(period) {
   try {
-    const res = await fetch(`${WEB_APP_URL}?action=counts&period=${period}`);
-    const data = await res.json();
+    const data = await fetch(`${WEB_APP_URL}?action=counts&period=${period}`).then(r=>r.json());
     countsData = {};
     (data.counts || []).forEach(c => { countsData[c.game_id] = c.count; });
-    delete countsData['hub-page'];
   } catch(e) { countsData = {}; }
   renderGames();
 }
 
 function renderGames() {
+  if (!GAMES.length) {
+    document.getElementById('game-list').innerHTML = '<div class="loading">載入中…</div>';
+    return;
+  }
   const categories = [...new Set(GAMES.map(g => g.category))];
   let total = 0;
   Object.values(countsData).forEach(v => total += v);
@@ -183,13 +161,13 @@ function renderGames() {
     const cards = games.map(g => {
       const count = countsData[g.id] || 0;
       return `
-      <div class="card" onclick="playGame('${g.id}','${encodeURIComponent(g.name)}','${encodeURIComponent(g.category)}','${g.url}')">
+      <div class="card" onclick="playGame('${g.id}','${encodeURIComponent(g.name)}','${encodeURIComponent(g.category)}','${encodeURIComponent(g.url)}')">
         <div class="card-img">${g.emoji}</div>
         <div class="card-body">
           <div class="card-name">${g.name}</div>
           <div class="card-desc">${g.desc}</div>
           <div class="card-footer">
-            <button class="play-btn" onclick="event.stopPropagation();playGame('${g.id}','${encodeURIComponent(g.name)}','${encodeURIComponent(g.category)}','${g.url}')">▶ 開始遊戲</button>
+            <button class="play-btn" onclick="event.stopPropagation();playGame('${g.id}','${encodeURIComponent(g.name)}','${encodeURIComponent(g.category)}','${encodeURIComponent(g.url)}')">▶ 開始遊戲</button>
             <div class="view-count">
               <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 12.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
               ${count.toLocaleString()}
@@ -220,14 +198,15 @@ function renderGames() {
   document.getElementById('game-list').innerHTML = html;
 }
 
-function playGame(id, nameEnc, catEnc, url) {
+function playGame(id, nameEnc, catEnc, urlEnc) {
   const name = decodeURIComponent(nameEnc);
   const cat  = decodeURIComponent(catEnc);
+  const url  = decodeURIComponent(urlEnc);
   fetch(`${WEB_APP_URL}?action=log&game_id=${id}&game_name=${encodeURIComponent(name)}&category=${encodeURIComponent(cat)}`).catch(()=>{});
   window.open(url, '_blank');
 }
 
-loadCounts('1month');
+init();
 </script>
 </body>
 </html>
