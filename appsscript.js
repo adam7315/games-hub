@@ -72,14 +72,16 @@ function getCounts(e) {
   const counts = {};
   rows.forEach(r => {
     if (!r[0] || !r[1]) return;
-    // 相容新格式（yyyy-MM-dd HH:mm:ss 台灣時間）與舊格式（ISO UTC）
-    let ts;
     const raw = String(r[0]);
-    if (raw.indexOf('T') !== -1) {
-      ts = new Date(raw);
-    } else {
-      ts = Utilities.parseDate(raw, 'Asia/Taipei', 'yyyy-MM-dd HH:mm:ss');
-    }
+    if (raw === 'timestamp') return;  // 跳過誤入資料列的表頭
+    let ts;
+    try {
+      if (raw.indexOf('T') !== -1) {
+        ts = new Date(raw);
+      } else {
+        ts = Utilities.parseDate(raw, 'Asia/Taipei', 'yyyy-MM-dd HH:mm:ss');
+      }
+    } catch(e) { return; }
     if (!ts || ts.getTime() < cutoff) return;
     const id = r[1];
     if (!counts[id]) counts[id] = { game_id:id, game_name:r[2], category:r[3], count:0 };
