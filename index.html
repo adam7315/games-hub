@@ -88,7 +88,7 @@ footer{text-align:center;padding:32px 16px;color:#484f58;font-size:12px}
   <p>水資源管理與海洋科學互動式課堂遊戲，讓學習更有趣</p>
   <div class="hero-stats">
     <div class="stat"><div class="stat-num" id="total-count">—</div><div class="stat-label">遊戲點擊次數</div></div>
-    <div class="stat"><div class="stat-num">3</div><div class="stat-label">款遊戲</div></div>
+    <div class="stat"><div class="stat-num" id="game-count">—</div><div class="stat-label">款遊戲</div></div>
   </div>
 </div>
 
@@ -152,6 +152,7 @@ function renderGames() {
   let total = 0;
   GAMES.forEach(g => { total += (countsData[g.id] || 0); });
   document.getElementById('total-count').textContent = total.toLocaleString();
+  document.getElementById('game-count').textContent = GAMES.length;
 
   const html = categories.map(cat => {
     const meta = CAT_META[cat] || { cls:'cat-water', icon:'🎮', desc:'', tag:'' };
